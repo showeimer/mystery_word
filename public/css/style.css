@@ -1,0 +1,34 @@
+.wrapper {
+  margin: 7.5% 20%;
+}
+
+header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+
+.gameScreen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-bottom: 2rem;
+  border-bottom: 2px solid black;
+}
+
+#blank, form {
+  align-self: center;
+}
+
+input {
+  font-size: 1.5rem;
+}
+
+button {
+  font-size: 1.5rem;
+}
+
+#blank {
+  font-size: 4rem;
+  letter-spacing: 8px;
+}

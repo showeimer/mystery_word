@@ -43,12 +43,35 @@ app.use((req, res, next) => {
 
 // webroot
 app.get('/', (req, res) => {
+  // Pull random word from list
   console.log(Math.round(Math.random() * words.length));
-  let word = words[Math.round(Math.random() * words.length)];
+  let word = words[Math.round(Math.random() * words.length)].toUpperCase();
+  let guesses = 8;
+
+  // Send word to session
   req.session.users.push(word);
   console.log(word);
-  res.render('home');
+
+  // Generating blank spaces
+  let blank = "";
+  for (let i = 0; i < word.length; i++) {
+    blank += "_"
+  }
+  console.log(blank);
+
+  res.render('home', {blank:blank, guesses:guesses});
 })
+
+// User enters a letter
+app.post('/guess', (req,res) => {
+  let letter = req.body.userGuess.toUpperCase();
+  console.log(letter);
+  req.checkBody('userGuess', 'Please enter a letter').notEmpty();
+  req.checkBody('userGuess', 'Only one letter per guess').len(1,1);
+
+  let errors = req.getValidationResult();
+
+});
 
 
 app.listen(3000, () => {
