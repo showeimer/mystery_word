@@ -35,44 +35,60 @@ app.use(expressValidator());
 
 // Loading session
 app.use((req, res, next) => {
-  if(!req.session.users) {
-    req.session.users = [];
+  if(!req.session.word) {
+    req.session.word = [];
   }
   next();
 });
 
+// Variables
+let guesses = 8;
+let word = "";
+let blank = "";
+
 // webroot
 app.get('/', (req, res) => {
   // Pull random word from list
-  console.log(Math.round(Math.random() * words.length));
   let word = words[Math.round(Math.random() * words.length)].toUpperCase();
-  let guesses = 8;
 
   // Send word to session
-  req.session.users.push(word);
-  console.log(word);
+  req.session.word.push(word);
+  console.log(req.session);
 
   // Generating blank spaces
-  let blank = "";
   for (let i = 0; i < word.length; i++) {
     blank += "_"
   }
-  console.log(blank);
 
   res.render('home', {blank:blank, guesses:guesses});
-})
+});
 
 // User enters a letter
 app.post('/guess', (req,res) => {
   let letter = req.body.userGuess.toUpperCase();
   console.log(letter);
-  req.checkBody('userGuess', 'Please enter a letter').notEmpty();
-  req.checkBody('userGuess', 'Only one letter per guess').len(1,1);
 
-  let errors = req.getValidationResult();
+  req.checkBody('userGuess', 'Please enter a letter').notEmpty();
+  // req.checkBody('userGuess', 'Only one letter per guess').len(1,1);
+
+  req.getValidationResult().then((result) => {
+    let errors = result.array();
+    // console.log(errors);
+    if (errors) {
+      res.render('home', {errors:errors, blank:blank, guesses:guesses});
+    }
+  })
+
+  .then(() => {
+    if(req.session.word[0].includes(letter)) {
+      console.log('the letter is in the word');
+      
+    } else {
+      console.log('FAIL!');
+    }
+  })
 
 });
-
 
 app.listen(3000, () => {
   console.log('App successfully loaded');

@@ -18,6 +18,9 @@
           <input type="text" name="userGuess" value="">
           <button>Make a Guess</button>
         </form>
+        {{#errors}}
+          <h4>{{msg}}</h4>
+        {{/errors}}
       </div>
 
       <div class="lettersGuessed">
