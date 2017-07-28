@@ -1,10 +1,12 @@
 // necessary modules/packages
 const fs = require('fs');
 const express = require('express');
-const handlebars = require('handlebars');
+const handlebars = require('express-handlebars');
 const session = require('express-session');
-const bodyParser = require('body-parsers');
+const bodyParser = require('body-parser');
 const expressValidator = require('express-validator');
+const words = fs.readFileSync("/usr/share/dict/words", "utf-8").toLowerCase().split("\n");
+
 
 // creating my mysterd word app
 const app = express();
@@ -34,10 +36,20 @@ app.use(expressValidator());
 // Loading session
 app.use((req, res, next) => {
   if(!req.session.users) {
-    req.sessions.users = [];
+    req.session.users = [];
   }
   next();
 });
+
+// webroot
+app.get('/', (req, res) => {
+  console.log(Math.round(Math.random() * words.length));
+  let word = words[Math.round(Math.random() * words.length)];
+  req.session.users.push(word);
+  console.log(word);
+  res.render('home');
+})
+
 
 app.listen(3000, () => {
   console.log('App successfully loaded');
