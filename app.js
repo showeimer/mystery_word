@@ -45,6 +45,7 @@ app.use((req, res, next) => {
 let guesses = 8;
 let word = "";
 let blank = "";
+let errors = [];
 
 // webroot
 app.get('/', (req, res) => {
@@ -52,12 +53,16 @@ app.get('/', (req, res) => {
   let word = words[Math.round(Math.random() * words.length)].toUpperCase();
 
   // Send word to session
-  req.session.word.push(word);
-  console.log(req.session);
+  if (req.session.word.length === 0) {
+    req.session.word.push(word);
+    console.log(req.session);
+  }
 
   // Generating blank spaces
-  for (let i = 0; i < word.length; i++) {
-    blank += "_"
+  if (blank.length === 0) {
+    for (let i = 0; i < word.length; i++) {
+      blank += "_"
+    }
   }
 
   res.render('home', {blank:blank, guesses:guesses});
@@ -69,25 +74,55 @@ app.post('/guess', (req,res) => {
   console.log(letter);
 
   req.checkBody('userGuess', 'Please enter a letter').notEmpty();
-  // req.checkBody('userGuess', 'Only one letter per guess').len(1,1);
+  req.checkBody('userGuess', 'Only one letter per guess').len(1,1);
 
   req.getValidationResult().then((result) => {
-    let errors = result.array();
-    // console.log(errors);
-    if (errors) {
+    errors = result.array();
+    console.log(errors);
+    if (errors.length = 0) {
       res.render('home', {errors:errors, blank:blank, guesses:guesses});
     }
   })
 
   .then(() => {
-    if(req.session.word[0].includes(letter)) {
-      console.log('the letter is in the word');
-      
-    } else {
-      console.log('FAIL!');
-    }
-  })
 
+    String.prototype.replaceAt = function(index, c) {
+      return this.substr(0, index) + c + this.substr(index + (c.length == 0 ? 1 : c.length));
+    }
+
+    if(req.session.word[0].includes(letter) && letter !== "") {
+      console.log('the letter is in the word');
+
+      for(let i = 0; i < req.session.word[0].length; i++) {
+        if(req.session.word[0][i] === letter) {
+          blank = blank.replaceAt(i,letter);
+          console.log(i);
+          console.log(blank);
+        }
+      }
+      res.redirect('/check');
+
+    } else if (guesses === 0) {
+        console.log('Game Over');
+        // res.render('gameover');
+
+    } else {
+      guesses--;
+      console.log('FAIL!');
+      res.redirect('/check');
+    }
+
+  }) //end of then
+
+}); //end of /guess post
+
+app.get('/check', (req,res) => {
+  res.redirect('/');
+});
+
+app.post('/playAgain', (req,res) => {
+  req.session.word === "";
+  res.redirect('/');
 });
 
 app.listen(3000, () => {
