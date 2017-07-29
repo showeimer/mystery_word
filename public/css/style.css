@@ -1,5 +1,6 @@
 .wrapper {
   margin: 7.5% 20%;
+  font-family: Helvetica;
 }
 
 header {
@@ -7,6 +8,8 @@ header {
   flex-direction: row;
   justify-content: space-between;
 }
+
+/* Game Main Body */
 
 .gameScreen {
   display: flex;
@@ -31,4 +34,10 @@ button {
 #blank {
   font-size: 4rem;
   letter-spacing: 8px;
+}
+
+/* Letter Bank Styling */
+
+.letterBank span {
+  word-spacing: 1rem;
 }

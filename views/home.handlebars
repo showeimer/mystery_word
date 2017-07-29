@@ -9,26 +9,30 @@
     <div class="wrapper">
       <header>
         <h3>Mystery Word</h1>
-        <h3>You have ({{guesses}}) guess(es) left</h2>
+        <h3>You have {{guesses}} guess(es) left</h2>
       </header>
 
       <div class="gameScreen">
         <h1 id="blank">{{blank}}</h1>
         <form action="/guess" method="post">
           <input type="text" name="userGuess" value="">
-          <button>Make a Guess</button>
+          <button>Guess</button>
         </form>
         {{#errors}}
           <h4>{{msg}}</h4>
         {{/errors}}
+        <h4>{{errorMessage}}</h4>
       </div>
 
       <div class="lettersGuessed">
         <h3>Letters guessed:  </h3>
         <section class="letterBank">
-
+          {{#lettersGuessed}}
+          <span>{{.}}<span>
+          {{/lettersGuessed}}
         </section>
       </div>
+
     </div>
   </body>
 </html>

@@ -45,15 +45,14 @@ app.use((req, res, next) => {
 let guesses = 8;
 let word = "";
 let blank = "";
-let errors = [];
+let lettersGuessed = [];
 
 // webroot
 app.get('/', (req, res) => {
-  // Pull random word from list
-  let word = words[Math.round(Math.random() * words.length)].toUpperCase();
 
   // Send word to session
   if (req.session.word.length === 0) {
+    word = words[Math.round(Math.random() * words.length)].toUpperCase();
     req.session.word.push(word);
     console.log(req.session);
   }
@@ -65,8 +64,9 @@ app.get('/', (req, res) => {
     }
   }
 
-  res.render('home', {blank:blank, guesses:guesses});
+  res.render('home', {blank:blank, guesses:guesses, lettersGuessed:lettersGuessed});
 });
+
 
 // User enters a letter
 app.post('/guess', (req,res) => {
@@ -78,12 +78,23 @@ app.post('/guess', (req,res) => {
 
   req.getValidationResult().then((result) => {
     errors = result.array();
-    console.log(errors);
-    if (errors.length = 0) {
-      res.render('home', {errors:errors, blank:blank, guesses:guesses});
+    // console.log(errors);
+    if (errors.length > 0) {
+      res.render('home', {errors:errors, blank:blank, guesses:guesses, lettersGuessed:lettersGuessed});
     }
+    console.log('No errors')
   })
 
+  // Check to see if letter was guessed
+  .then(() => {
+    if(lettersGuessed.includes(letter) && letter !== "") {
+      let errorMessage = 'You already guessed that letter, try again.';
+      res.render('home', {errorMessage:errorMessage, blank:blank, guesses:guesses, lettersGuessed:lettersGuessed});
+    }
+    console.log('Letter has not already been guessed');
+  })
+
+  // Correct guess, and code for winning
   .then(() => {
 
     String.prototype.replaceAt = function(index, c) {
@@ -91,24 +102,33 @@ app.post('/guess', (req,res) => {
     }
 
     if(req.session.word[0].includes(letter) && letter !== "") {
-      console.log('the letter is in the word');
+      console.log('Correct');
+
+      lettersGuessed.push(letter);
 
       for(let i = 0; i < req.session.word[0].length; i++) {
         if(req.session.word[0][i] === letter) {
           blank = blank.replaceAt(i,letter);
           console.log(i);
           console.log(blank);
+
+          if(word === blank) {
+            (console.log('You win!'));
+          }
         }
       }
       res.redirect('/check');
 
-    } else if (guesses === 0) {
-        console.log('Game Over');
-        // res.render('gameover');
-
+    // Wrong guess, and lose game
     } else {
       guesses--;
-      console.log('FAIL!');
+      lettersGuessed.push(letter);
+      console.log('Wrong');
+      if (guesses === 0) {
+          console.log('Game Over');
+          // res.render('gameover');
+
+      }
       res.redirect('/check');
     }
 
@@ -116,14 +136,19 @@ app.post('/guess', (req,res) => {
 
 }); //end of /guess post
 
+
+// Force refresh page
 app.get('/check', (req,res) => {
   res.redirect('/');
 });
 
+
+// Restart game
 app.post('/playAgain', (req,res) => {
   req.session.word === "";
   res.redirect('/');
 });
+
 
 app.listen(3000, () => {
   console.log('App successfully loaded');
