@@ -36,6 +36,11 @@ button {
   letter-spacing: 8px;
 }
 
+#errorMessage {
+  margin-top: 5%;
+  margin-bottom: -5%;
+}
+
 /* Letter Bank Styling */
 
 .letterBank span {

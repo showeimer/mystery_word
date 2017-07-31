@@ -47,6 +47,16 @@ let word = "";
 let blank = "";
 let lettersGuessed = [];
 
+// Custom validator that checks if a letter has been guessed
+// app.use(expressValidator({
+//  customValidators: {
+//   letterCheck: function(character,bank) {
+//     return bank.includes(character)
+//     }
+//  }
+// }));
+
+
 // webroot
 app.get('/', (req, res) => {
 
@@ -73,14 +83,16 @@ app.post('/guess', (req,res) => {
   let letter = req.body.userGuess.toUpperCase();
   console.log(letter);
 
-  req.checkBody('userGuess', 'Please enter a letter').notEmpty();
-  req.checkBody('userGuess', 'Only one letter per guess').len(1,1);
+  req.checkBody('userGuess', 'Must enter a letter').notEmpty();
+  req.checkBody('userGuess', 'One letter per guess').len(1,1);
+  // req.checkBody('userGuess', 'You already guessed that letter').isIn(lettersGuessed);
 
   req.getValidationResult().then((result) => {
-    errors = result.array();
-    // console.log(errors);
-    if (errors.length > 0) {
-      res.render('home', {errors:errors, blank:blank, guesses:guesses, lettersGuessed:lettersGuessed});
+
+    // If there is a result, throw an error
+    if (!result.isEmpty()) {
+      // result.array().throw
+      throw new Error(result.array().map((item) => item.msg).join(' | '));
     }
     console.log('No errors')
   })
@@ -97,27 +109,32 @@ app.post('/guess', (req,res) => {
   // Correct guess, and code for winning
   .then(() => {
 
+    // Stack overflow function steal
     String.prototype.replaceAt = function(index, c) {
       return this.substr(0, index) + c + this.substr(index + (c.length == 0 ? 1 : c.length));
     }
 
+    // If the guessed letter is in the word, run this code
     if(req.session.word[0].includes(letter) && letter !== "") {
       console.log('Correct');
-
       lettersGuessed.push(letter);
 
+      // Replace all blanks with the correct letter
       for(let i = 0; i < req.session.word[0].length; i++) {
         if(req.session.word[0][i] === letter) {
           blank = blank.replaceAt(i,letter);
-          console.log(i);
+          // console.log(i);
           console.log(blank);
-
-          if(word === blank) {
-            (console.log('You win!'));
-          }
         }
       }
+
+      // if the word is guessed, then render the winning page
+      if(word === blank) {
+        (console.log('You win!'));
+        res.render('end', {gameWin: 'You won!', word:word});
+      } else {
       res.redirect('/check');
+      }
 
     // Wrong guess, and lose game
     } else {
@@ -125,14 +142,18 @@ app.post('/guess', (req,res) => {
       lettersGuessed.push(letter);
       console.log('Wrong');
       if (guesses === 0) {
-          console.log('Game Over');
-          // res.render('gameover');
-
-      }
+        console.log('Game Over');
+        res.render('end', {gameOver: 'Game Over', word: word});
+      } else {
       res.redirect('/check');
+      }
     }
 
   }) //end of then
+
+  .catch((error) => {
+    console.log(error);
+    res.render('home', {error:error, blank:blank, guesses: guesses, lettersGuessed: lettersGuessed})});
 
 }); //end of /guess post
 
@@ -145,7 +166,12 @@ app.get('/check', (req,res) => {
 
 // Restart game
 app.post('/playAgain', (req,res) => {
-  req.session.word === "";
+  console.log(req.session.word);
+  req.session.word = [];
+  guesses = 8;
+  word = "";
+  blank = "";
+  lettersGuessed = [];
   res.redirect('/');
 });
 

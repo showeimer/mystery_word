@@ -18,9 +18,9 @@
           <input type="text" name="userGuess" value="">
           <button>Guess</button>
         </form>
-        {{#errors}}
-          <h4>{{msg}}</h4>
-        {{/errors}}
+        {{#error}}
+          <h4 id="errorMessage">{{.}}</h4>
+        {{/error}}
         <h4>{{errorMessage}}</h4>
       </div>
 
