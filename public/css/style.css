@@ -46,3 +46,19 @@ button {
 .letterBank span {
   word-spacing: 1rem;
 }
+
+
+/* Game End Page Styles */
+.gameResultScreen {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+#gameResult, #word {
+  align-self: center;
+}
+
+#gameResult {
+  font-size: 5rem;
+}

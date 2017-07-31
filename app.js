@@ -47,16 +47,6 @@ let word = "";
 let blank = "";
 let lettersGuessed = [];
 
-// Custom validator that checks if a letter has been guessed
-// app.use(expressValidator({
-//  customValidators: {
-//   letterCheck: function(character,bank) {
-//     return bank.includes(character)
-//     }
-//  }
-// }));
-
-
 // webroot
 app.get('/', (req, res) => {
 
@@ -85,16 +75,17 @@ app.post('/guess', (req,res) => {
 
   req.checkBody('userGuess', 'Must enter a letter').notEmpty();
   req.checkBody('userGuess', 'One letter per guess').len(1,1);
-  // req.checkBody('userGuess', 'You already guessed that letter').isIn(lettersGuessed);
 
   req.getValidationResult().then((result) => {
 
-    // If there is a result, throw an error
+    // If there is a result, throw an error.  If letter was already guessed, throw an error
     if (!result.isEmpty()) {
-      // result.array().throw
       throw new Error(result.array().map((item) => item.msg).join(' | '));
-    }
+    } else if (lettersGuessed.includes(letter)) {
+      throw new Error('Letter has already been guessed');
+    } else {
     console.log('No errors')
+    }
   })
 
   // Check to see if letter was guessed
@@ -131,7 +122,7 @@ app.post('/guess', (req,res) => {
       // if the word is guessed, then render the winning page
       if(word === blank) {
         (console.log('You win!'));
-        res.render('end', {gameWin: 'You won!', word:word});
+        res.render('end', {gameWin: 'You Win!', word:word});
       } else {
       res.redirect('/check');
       }
