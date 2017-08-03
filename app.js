@@ -73,8 +73,8 @@ app.post('/guess', (req,res) => {
   let letter = req.body.userGuess.toUpperCase();
   console.log(letter);
 
-  req.checkBody('userGuess', 'Must enter a letter').notEmpty();
-  req.checkBody('userGuess', 'One letter per guess').len(1,1);
+  req.checkBody('userGuess', 'Must be a letter in the Alphabet').isAlpha();
+  req.checkBody('userGuess', 'Must enter one letter').len(1,1);
 
   req.getValidationResult().then((result) => {
 
@@ -88,16 +88,6 @@ app.post('/guess', (req,res) => {
     }
   })
 
-  // Check to see if letter was guessed
-  .then(() => {
-    if(lettersGuessed.includes(letter) && letter !== "") {
-      let errorMessage = 'You already guessed that letter, try again.';
-      res.render('home', {errorMessage:errorMessage, blank:blank, guesses:guesses, lettersGuessed:lettersGuessed});
-    }
-    console.log('Letter has not already been guessed');
-  })
-
-  // Correct guess, and code for winning
   .then(() => {
 
     // Stack overflow function steal
