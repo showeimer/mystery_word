@@ -15,7 +15,6 @@ On the page, show the number of letters in the word like so:
 
 ```
 _ _ _ _ _ _ _
-
 ```
 
 Ask the user to supply one guess (i.e. letter) at a time, using a form. This form should be validated to make sure only 1 letter is sent. This letter can be upper or lower case and it should not matter. If a user enters more than one letter, tell them the input is invalid and let them try again.
