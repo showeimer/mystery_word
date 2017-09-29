@@ -24,7 +24,9 @@ Let the user know if their guess appears in the computer's word. You will have t
 
 Display the partially guessed word, as well as letters that have not been guessed. For example, if the word is BOMBARD and the letters guessed are a, b, and d, the screen should display:
 
+```
 B _ _ B A _ D
+```
 
 A user is allowed 8 guesses. Remind the user of how many guesses they have left after each round. The guesses they have left will be determined by what you have in the session.
 
